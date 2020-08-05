@@ -12,8 +12,8 @@
                 "authentication": "<strong>Aanmelden mislukt!</strong> Gelieve uw gegevens te controleren en vervolgens opnieuw te proberen."
             }
         },
-        "password" : {
-            "forgot": "Ben u uw wachtwoord vergeten?"
+        "password": {
+            "forgot": "Bent u uw wachtwoord vergeten?"
         }
     }
 }

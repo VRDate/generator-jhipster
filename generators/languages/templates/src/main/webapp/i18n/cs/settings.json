@@ -1,6 +1,6 @@
 {
     "settings": {
-        "title": "Nastavení uživatele [<b>{{username}}</b>]",
+        "title": "Nastavení uživatele [<strong>{{username}}</strong>]",
         "form": {
             "firstname": "Křestní jméno",
             "firstname.placeholder": "Vaše křestní jméno",
@@ -12,7 +12,7 @@
         "messages": {
             "error": {
                 "fail": "<strong>Vyskytla se chyba!</strong> Nastavení nelze uložit.",
-                "emailexists": "<strong>E-mailová adresa je již používána!</strong> Prosím použjite jinou adresu."
+                "emailexists": "<strong>Emailová adresa je již používána!</strong> Prosím použjite jinou adresu."
             },
             "success": "<strong>Nastavení bylo uloženo!</strong>",
             "validate": {

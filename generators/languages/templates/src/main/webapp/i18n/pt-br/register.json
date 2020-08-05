@@ -2,18 +2,18 @@
     "register": {
         "title": "Cadastro",
         "form": {
-            "button": "Cadastre"
+            "button": "Cadastrar"
         },
         "messages": {
             "validate": {
                 "login": {
                     "required": "O usuário é obrigatório.",
-                    "minlength": "O usuário deve ter pelo menos 1 caractere",
-                    "maxlength": "O usuário não pode ter mais de 50 caracteres",
-                    "pattern": "Your login can only contain lower-case letters and digits"
+                    "minlength": "O usuário deve ter pelo menos 1 caractere.",
+                    "maxlength": "O usuário não pode ter mais de 50 caracteres.",
+                    "pattern": "Your username is invalid."
                 }
             },
-            "success": "<strong>Cadstro salvo com sucesso!</strong> Favor verificar seu e-mail para confirmar a conta.",
+            "success": "<strong>Cadastro realizado com sucesso!</strong> Favor verificar seu e-mail para confirmar a conta.",
             "error": {
                 "fail": "<strong>Erro ao realizar o cadastro!</strong> Favor tentar novamente mais tarde.",
                 "userexists": "<strong>Usuário já registrado!</strong> Favor escolher outro.",

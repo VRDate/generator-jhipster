@@ -1,8 +1,0 @@
-{
-  "devDependencies": {
-    <%_ otherModules.forEach(function(module) { _%>
-    "<%= module.name %>": "<%= module.version %>",
-    <%_ }); _%>
-    "generator-jhipster": "<%= jhipsterVersion %>"
-  }
-}

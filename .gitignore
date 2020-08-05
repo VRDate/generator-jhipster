@@ -1,4 +1,5 @@
 node_modules
+coverage
 .idea
 *.iml
 *.ipr
@@ -6,6 +7,16 @@ node_modules
 atlassian-ide-plugin.xml
 /.project
 test/temp/
-npm-debug.log*
+/docs
+*debug.log*
 .vscode
-yarn.lock
+.DS_Store
+/.jhipster
+*.sw?
+/test/templates/import-jdl/*.png
+.git
+.classpath
+.factorypath
+.project
+.settings
+test/**/*.png

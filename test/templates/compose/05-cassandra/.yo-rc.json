@@ -6,13 +6,14 @@
     "packageFolder": "com/mycompany/myapp",
     "serverPort": "8081",
     "authenticationType": "jwt",
-    "hibernateCache": "no",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
     "databaseType": "cassandra",
     "devDatabaseType": "cassandra",
     "prodDatabaseType": "cassandra",
     "searchEngine": "no",
     "buildTool": "maven",
-    "jwtSecretKey": "ed1aed6c51fbacff6d9f05a893aea7abb9d9c54a",
+    "jwtSecretKey": "fd54a45s65fds737b9aafcb3412e07ed99b267f33413274720ddbb7f6c5e64e9f14075f2d7ed041592f0b7657baf8",
     "enableTranslation": true,
     "applicationType": "microservice",
     "testFrameworks": [
@@ -25,8 +26,6 @@
     "languages": [
       "en"
     ],
-    "clusteredHttpSession": "no",
-    "websocket": "no",
-    "enableSocialSignIn": false
+    "websocket": "no"
   }
 }

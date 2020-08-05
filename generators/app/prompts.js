@@ -1,223 +1,182 @@
-'use strict';
-
-var chalk = require('chalk');
-
+/**
+ * Copyright 2013-2020 the original author or authors from the JHipster project.
+ *
+ * This file is part of the JHipster project, see https://www.jhipster.tech/
+ * for more information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const chalk = require('chalk');
+const statistics = require('../statistics');
+const packagejs = require('../../package.json');
+const generatorDefaults = require('../generator-defaults').defaultConfig;
 
 module.exports = {
     askForInsightOptIn,
     askForApplicationType,
     askForModuleName,
-    askFori18n,
     askForTestOpts,
-    askForClient,
-    askForMoreModules
+    askForMoreModules,
 };
 
-function askForInsightOptIn() {
-    if (this.existingProject) return;
-
-    var done = this.async();
-    var insight = this.insight();
-
-    this.prompt({
-        when: function () {
-            return insight.optOut === undefined;
-        },
+async function askForInsightOptIn() {
+    const answers = await this.prompt({
+        when: () => statistics.shouldWeAskForOptIn(),
         type: 'confirm',
         name: 'insight',
-        message: 'May ' + chalk.cyan('JHipster') + ' anonymously report usage statistics to improve the tool over time?',
-        default: true
-    }).then(function (prompt) {
-        if (prompt.insight !== undefined) {
-            insight.optOut = !prompt.insight;
-        }
-        done();
-    }.bind(this));
+        message: `May ${chalk.cyan('JHipster')} anonymously report usage statistics to improve the tool over time?`,
+        default: true,
+    });
+    if (answers.insight !== undefined) {
+        statistics.setOptoutStatus(!answers.insight);
+    }
 }
 
-function askForApplicationType() {
+async function askForApplicationType() {
     if (this.existingProject) return;
 
-    const DEFAULT_APPTYPE = 'monolith';
-    if (this.skipServer) {
-        this.applicationType = this.configOptions.applicationType = DEFAULT_APPTYPE;
-        return;
-    }
-
-    var done = this.async();
-    var getNumberedQuestion = this.getNumberedQuestion.bind(this);
-
-    this.prompt({
-        type: 'list',
-        name: 'applicationType',
-        message: function (response) {
-            return getNumberedQuestion('Which *type* of application would you like to create?', true);
+    const applicationTypeChoices = [
+        {
+            value: 'monolith',
+            name: 'Monolithic application (recommended for simple projects)',
         },
-        choices: [
-            {
-                value: DEFAULT_APPTYPE,
-                name: 'Monolithic application (recommended for simple projects)'
-            },
-            {
-                value: 'microservice',
-                name: 'Microservice application'
-            },
-            {
-                value: 'gateway',
-                name: 'Microservice gateway'
-            },
-            {
-                value: 'uaa',
-                name: '[BETA] JHipster UAA server (for microservice OAuth2 authentication)'
-            }
-        ],
-        default: DEFAULT_APPTYPE
-    }).then(function (prompt) {
-        this.applicationType = this.configOptions.applicationType = prompt.applicationType;
-        done();
-    }.bind(this));
+        {
+            value: 'microservice',
+            name: 'Microservice application',
+        },
+        {
+            value: 'gateway',
+            name: 'Microservice gateway',
+        },
+        {
+            value: 'uaa',
+            name: 'JHipster UAA server',
+        },
+    ];
+
+    const answers = await this.prompt([
+        {
+            type: 'list',
+            name: 'applicationType',
+            message: `Which ${chalk.yellow('*type*')} of application would you like to create?`,
+            choices: applicationTypeChoices,
+            default: generatorDefaults.applicationType,
+        },
+        {
+            when: answers => ['gateway', 'monolith', 'microservice'].includes(answers.applicationType),
+            type: 'confirm',
+            name: 'reactive',
+            message: '[Beta] Do you want to make it reactive with Spring WebFlux?',
+            default: generatorDefaults.reactive,
+        },
+    ]);
+    this.applicationType = this.jhipsterConfig.applicationType = answers.applicationType;
+    this.reactive = this.jhipsterConfig.reactive = answers.reactive;
 }
 
 function askForModuleName() {
-    if (this.existingProject) return;
-
-    this.askModuleName(this);
-    this.configOptions.lastQuestion = this.currentQuestion;
-    this.configOptions.totalQuestions = this.totalQuestions;
+    if (this.existingProject) return undefined;
+    return this.askModuleName(this);
 }
 
-function askFori18n() {
-    this.currentQuestion = this.configOptions.lastQuestion;
-    this.totalQuestions = this.configOptions.totalQuestions;
-    if (this.skipI18n || this.existingProject) return;
-    this.aski18n(this);
-}
+async function askForTestOpts() {
+    if (this.existingProject) return undefined;
 
-function askForTestOpts() {
-    if (this.existingProject) return;
-
-    var getNumberedQuestion = this.getNumberedQuestion.bind(this);
-    var choices = [];
-    var defaultChoice = [];
+    const choices = [];
     if (!this.skipServer) {
         // all server side test frameworks should be added here
-        choices.push(
-            {name: 'Gatling', value: 'gatling'},
-            {name: 'Cucumber', value: 'cucumber'}
-        );
+        choices.push({ name: 'Gatling', value: 'gatling' }, { name: 'Cucumber', value: 'cucumber' });
     }
     if (!this.skipClient) {
         // all client side test frameworks should be added here
-        choices.push(
-            {name: 'Protractor', value: 'protractor'}
-        );
+        choices.push({ name: 'Protractor', value: 'protractor' });
     }
-    var done = this.async();
-
-    this.prompt({
+    const PROMPT = {
         type: 'checkbox',
         name: 'testFrameworks',
-        message: function (response) {
-            return getNumberedQuestion('Besides JUnit and Karma, which testing frameworks would you like to use?', true);
-        },
-        choices: choices,
-        default: defaultChoice
-    }).then(function (prompt) {
-        this.testFrameworks = prompt.testFrameworks;
-        done();
-    }.bind(this));
+        message: 'Besides JUnit and Jest, which testing frameworks would you like to use?',
+        choices,
+        default: generatorDefaults.testFrameworks,
+    };
+
+    const answers = await this.prompt(PROMPT);
+    this.testFrameworks = this.jhipsterConfig.testFrameworks = answers.testFrameworks;
+    return answers;
 }
-
-function askForClient() {
-    if (this.existingProject) return;
-
-    var done = this.async();
-    var getNumberedQuestion = this.getNumberedQuestion.bind(this);
-    var applicationType = this.applicationType;
-
-    this.prompt({
-        type: 'list',
-        name: 'clientFramework',
-        when: function (response) {
-            return (applicationType !== 'microservice' && applicationType !== 'uaa');
-        },
-        message: function (response) {
-            return getNumberedQuestion('Which *Framework* would you like to use for the client?', applicationType !== 'microservice' && applicationType !== 'uaa');
-        },
-        choices: [
-            {
-                value: 'angular1',
-                name: 'Angular 1.x'
-            },
-            {
-                value: 'angular2',
-                name: '[BETA] Angular 2.x'
-            }
-        ],
-        default: 'angular1'
-    }).then(function (prompt) {
-        this.clientFramework = this.configOptions.clientFramework = prompt.clientFramework;
-        done();
-    }.bind(this));
-}
-
 
 function askForMoreModules() {
     if (this.existingProject) {
-        return;
+        return undefined;
     }
 
-    var done = this.async();
-    var generator = this;
-    this.prompt({
+    return this.prompt({
         type: 'confirm',
         name: 'installModules',
-        message: function(response) {
-            return generator.getNumberedQuestion('Would you like to install other generators from the JHipster Marketplace?', true);
-        },
-        default: false
-    }).then(function (prompt) {
-        if (prompt.installModules) {
-            askModulesToBeInstalled(done, generator);
-        } else {
-            done();
+        message: 'Would you like to install other generators from the JHipster Marketplace?',
+        default: false,
+    }).then(answers => {
+        if (answers.installModules) {
+            return new Promise(resolve => askModulesToBeInstalled(resolve, this));
         }
-    }.bind(this));
+        return undefined;
+    });
 }
 
 function askModulesToBeInstalled(done, generator) {
-    generator.httpGet('http://npmsearch.com/query?fields=name,description,author,version&q=keywords:jhipster-module&start=0&size=50',
-        function(body) {
-            var moduleResponse = JSON.parse(body);
-            var choices = [];
-            moduleResponse.results.forEach(function (modDef) {
-                choices.push({
-                    value: { name:modDef.name, version:modDef.version},
-                    name: `(${modDef.name}-${modDef.version}) ${modDef.description} [${modDef.author}]`
-                });
-            });
-            if (choices.length > 0) {
-                generator.prompt({
-                    type: 'checkbox',
-                    name: 'otherModules',
-                    message: 'Which other modules would you like to use?',
-                    choices: choices,
-                    default: []
-                }).then(function (prompt) {
-                    // [ {name: [moduleName], version:[version]}, ...]
-                    generator.otherModules = [];
-                    prompt.otherModules.forEach(function(module) {
-                        generator.otherModules.push({name:module.name[0], version:module.version[0]});
+    const jHipsterMajorVersion = packagejs.version.match(/^(\d+)/g);
+
+    generator.httpsGet(
+        `https://api.npms.io/v2/search?q=keywords:jhipster-module+jhipster-${jHipsterMajorVersion}&from=0&size=50`,
+        body => {
+            try {
+                const moduleResponse = JSON.parse(body);
+                const choices = [];
+                moduleResponse.results.forEach(modDef => {
+                    choices.push({
+                        value: { name: modDef.package.name, version: modDef.package.version },
+                        name: `(${modDef.package.name}-${modDef.package.version}) ${modDef.package.description}`,
                     });
-                    generator.configOptions.otherModules = this.otherModules;
+                });
+                if (choices.length > 0) {
+                    generator
+                        .prompt({
+                            type: 'checkbox',
+                            name: 'otherModules',
+                            message: 'Which other modules would you like to use?',
+                            choices,
+                            default: [],
+                        })
+                        .then(answers => {
+                            // [ {name: [moduleName], version:[version]}, ...]
+                            answers.otherModules.forEach(module => {
+                                generator.otherModules.push({ name: module.name, version: module.version });
+                            });
+                            generator.jhipsterConfig.otherModules = generator.otherModules;
+                            done();
+                        });
+                } else {
                     done();
-                }.bind(generator));
-            } else {
+                }
+            } catch (err) {
+                generator.warning(`Error while parsing. Please install the modules manually or try again later. ${err.message}`);
+                generator.debug('Error:', err);
                 done();
             }
         },
-        function (error) {
-            generator.warning(`Unable to contact server to fetch additional modules: ${ error.message }`);
+        error => {
+            generator.warning(`Unable to contact server to fetch additional modules: ${error.message}`);
+            generator.debug('Error:', error);
             done();
-        });
+        }
+    );
 }

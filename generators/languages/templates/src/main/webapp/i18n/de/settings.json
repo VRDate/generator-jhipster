@@ -1,6 +1,6 @@
 {
     "settings": {
-        "title": "Einstellungen für Benutzer [<b>{{username}}</b>]",
+        "title": "Einstellungen für Benutzer [<strong>{{username}}</strong>]",
         "form": {
             "firstname": "Vorname",
             "firstname.placeholder": "Ihr Vorname",
@@ -12,7 +12,7 @@
         "messages": {
             "error": {
                 "fail": "<strong>Es ist ein Fehler aufgetreten!</strong> Die Einstellungen konnten nicht gespeichert werden.",
-                "emailexists": "<strong>E-mail wird bereits verwendet!</strong> Bitte wählen Sie eine andere aus."
+                "emailexists": "<strong>Email wird bereits verwendet!</strong> Bitte wählen Sie eine andere aus."
             },
             "success": "<strong>Einstellungen wurden gespeichert!</strong>",
             "validate": {
