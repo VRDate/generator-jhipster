@@ -74,7 +74,7 @@
         "normalize-path": "3.0.0",
         "ora": "5.1.0",
         "os-locale": "5.0.0",
-        "parse-gitignore": "1.0.1",
+        "parse-gitignore": "2.0.0",
         "pluralize": "8.0.0",
         "prettier": "2.1.2",
         "prettier-plugin-java": "0.8.2",
